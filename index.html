@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Presentation Timer</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif; background: var(--color-background-tertiary); color: var(--color-text-primary); padding: 1rem; }
@@ -42,11 +41,16 @@
     }
     .timer-wrap { display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0; max-width: 480px; margin: 0 auto; }
     .header { display: flex; justify-content: flex-end; }
-    .gear-btn { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: #ffffff; transition: background 0.15s; }
+    .gear-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 12px; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-primary); transition: background 0.15s; }
     .gear-btn:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
     .gear-btn:active { transform: scale(0.98); }
-    .settings-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; display: none; }
-    .settings-panel.open { display: block; }
+    .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+    .settings-overlay.open { display: flex; }
+    .settings-panel { background: var(--color-background-primary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 90%; max-width: 420px; max-height: 85vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.25); position: relative; }
+    .settings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .settings-title { font-size: 15px; font-weight: 600; color: var(--color-text-primary); }
+    .settings-close { width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-secondary); font-size: 18px; line-height: 1; }
+    .settings-close:hover { background: var(--color-background-secondary); }
     .settings-row { margin-bottom: 14px; }
     .settings-row:last-child { margin-bottom: 0; }
     .settings-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); display: block; margin-bottom: 8px; }
@@ -88,10 +92,15 @@
 <body>
   <div class="timer-wrap">
     <div class="header">
-      <button class="gear-btn" id="gear-btn" aria-label="Settings"><i class="ti ti-settings" aria-hidden="true"></i></button>
+      <button class="gear-btn" id="gear-btn" aria-label="Settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</button>
     </div>
-
+ 
+    <div class="settings-overlay" id="settings-overlay">
     <div class="settings-panel" id="settings-panel">
+      <div class="settings-header">
+        <span class="settings-title">Settings</span>
+        <button class="settings-close" id="settings-close" aria-label="Close settings">&#x2715;</button>
+      </div>
       <div class="settings-row">
         <label class="settings-label">Voice</label>
         <div class="seg-group" role="tablist">
@@ -116,7 +125,8 @@
         <div class="hint">Tap a bell to select. Tap the play icon to preview.</div>
       </div>
     </div>
-
+    </div>
+ 
     <div class="clock-row">
       <svg width="180" height="180" viewBox="0 0 200 200" role="img" aria-label="Analog clock">
         <circle cx="100" cy="100" r="94" fill="var(--color-background-primary)" stroke="var(--color-border-secondary)" stroke-width="1"/>
@@ -128,7 +138,7 @@
       </svg>
       <div class="clock-readout"><strong id="clock-time">--:--:--</strong> <span id="clock-tz">Local</span></div>
     </div>
-
+ 
     <div class="timer-card">
       <div class="timer-display" id="timer-display">05:00</div>
       <div class="set-row">
@@ -136,9 +146,9 @@
         <input type="number" id="set-minutes" value="5" min="1" max="180" step="1"/>
       </div>
       <div class="controls">
-        <button id="start-btn"><i class="ti ti-player-play" aria-hidden="true"></i> Start</button>
-        <button id="pause-btn"><i class="ti ti-player-pause" aria-hidden="true"></i> Pause</button>
-        <button id="reset-btn"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
+        <button id="start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Start</button>
+        <button id="pause-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause</button>
+        <button id="reset-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Reset</button>
       </div>
       <div class="auto-row">
         <span>Auto announcements at 3, 1 min &amp; end</span>
@@ -148,20 +158,19 @@
         </label>
       </div>
     </div>
-
+ 
     <div>
       <div class="section-label">Manual sounds — tap any time</div>
       <div class="btn-grid">
-        <button id="btn-5min"><i class="ti ti-volume" aria-hidden="true"></i> 5 min left</button>
-        <button id="btn-3min"><i class="ti ti-volume" aria-hidden="true"></i> 3 min left</button>
-        <button id="btn-1min"><i class="ti ti-volume" aria-hidden="true"></i> 1 min left</button>
-        <button id="btn-done"><i class="ti ti-volume" aria-hidden="true"></i> Time's up</button>
-        <button id="btn-bell"><i class="ti ti-bell" aria-hidden="true"></i> Bell</button>
+        <button id="btn-5min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 5 min left</button>
+        <button id="btn-3min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 3 min left</button>
+        <button id="btn-1min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 1 min left</button>
+        <button id="btn-done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Time's up</button>
+        <button id="btn-bell"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Bell</button>
       </div>
     </div>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.umd.js"></script>
+ 
   <script>
 (function() {
   const markers = document.getElementById('clock-markers');
@@ -179,10 +188,10 @@
     ln.setAttribute('stroke-linecap', 'round');
     markers.appendChild(ln);
   }
-
+ 
   let selectedTz = 'LOCAL';
   const localTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) { return 'UTC'; } })();
-
+ 
   function populateTimezones() {
     const sel = document.getElementById('tz-select');
     sel.innerHTML = '';
@@ -190,13 +199,13 @@
     localOpt.value = 'LOCAL';
     localOpt.textContent = 'Local time (' + localTz + ')';
     sel.appendChild(localOpt);
-
+ 
     let zones = [];
     try { zones = Intl.supportedValuesOf('timeZone'); } catch(e) {}
     if (!zones.length) {
       zones = ['UTC','America/New_York','America/Los_Angeles','America/Chicago','America/Denver','America/Toronto','America/Vancouver','America/Mexico_City','America/Sao_Paulo','America/Buenos_Aires','Europe/London','Europe/Paris','Europe/Berlin','Europe/Madrid','Europe/Rome','Europe/Amsterdam','Europe/Moscow','Europe/Istanbul','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Asia/Dubai','Asia/Kolkata','Asia/Bangkok','Asia/Singapore','Asia/Hong_Kong','Asia/Shanghai','Asia/Tokyo','Asia/Seoul','Asia/Jakarta','Australia/Sydney','Australia/Melbourne','Australia/Perth','Pacific/Auckland','Pacific/Honolulu'];
     }
-
+ 
     const groups = {};
     zones.forEach(z => {
       const region = z.split('/')[0];
@@ -226,7 +235,7 @@
     });
     sel.value = selectedTz;
   }
-
+ 
   function getClockTime(tz) {
     const now = new Date();
     const opts = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
@@ -246,13 +255,13 @@
       return p ? p.value : '';
     } catch(e) { return ''; }
   }
-
+ 
   const hourHand = document.getElementById('hour-hand');
   const minHand = document.getElementById('minute-hand');
   const secHand = document.getElementById('second-hand');
   const timeEl = document.getElementById('clock-time');
   const tzEl = document.getElementById('clock-tz');
-
+ 
   function tickClock() {
     const { h24, m, s } = getClockTime(selectedTz);
     const h = h24 % 12;
@@ -267,7 +276,7 @@
       tzEl.textContent = '· ' + city + (ab ? ' (' + ab + ')' : '');
     }
   }
-
+ 
   let audioCtx = null;
   function getCtx() {
     if (!audioCtx) {
@@ -278,7 +287,7 @@
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
-
+ 
   function playBellChime() {
     const ctx = getCtx(); if (!ctx) return;
     const now = ctx.currentTime;
@@ -364,7 +373,7 @@
       });
     });
   }
-
+ 
   const bells = [
     { id: 'gong',   label: 'Gong',   play: playGong },
     { id: 'bell',   label: 'Chime',  play: playBellChime },
@@ -383,7 +392,7 @@
     const el = document.createElement('div');
     el.className = 'bell-option' + (b.id === selectedBellId ? ' active' : '');
     el.dataset.id = b.id;
-    el.innerHTML = `<span>${b.label}</span><span class="preview" data-preview="${b.id}" role="button" aria-label="Preview ${b.label}"><i class="ti ti-player-play" aria-hidden="true"></i></span>`;
+    el.innerHTML = `<span>${b.label}</span><span class="preview" data-preview="${b.id}" role="button" aria-label="Preview ${b.label}"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></span>`;
     el.addEventListener('click', (e) => {
       if (e.target.closest('[data-preview]')) { getCtx(); b.play(); return; }
       selectedBellId = b.id;
@@ -392,19 +401,19 @@
     });
     bellGrid.appendChild(el);
   });
-
+ 
   let voices = [];
   let selectedGender = 'female';
   let selectedLang = 'en-GB';
   let selectedVoice = null;
   let userPickedLang = false;
-
+ 
   const langLabels = {
     'en-US':'English (United States)','en-GB':'English (United Kingdom)','en-AU':'English (Australia)','en-IN':'English (India)','en-IE':'English (Ireland)','en-ZA':'English (South Africa)','en-NZ':'English (New Zealand)','en-CA':'English (Canada)',
     'fr-FR':'French (France)','fr-CA':'French (Canada)','es-ES':'Spanish (Spain)','es-MX':'Spanish (Mexico)','es-US':'Spanish (US)','de-DE':'German','it-IT':'Italian','pt-BR':'Portuguese (Brazil)','pt-PT':'Portuguese (Portugal)','ja-JP':'Japanese','ko-KR':'Korean','zh-CN':'Chinese (Mandarin)','zh-HK':'Chinese (Cantonese)','zh-TW':'Chinese (Taiwan)','nl-NL':'Dutch','sv-SE':'Swedish','da-DK':'Danish','nb-NO':'Norwegian','fi-FI':'Finnish','pl-PL':'Polish','ru-RU':'Russian','tr-TR':'Turkish','ar-SA':'Arabic','hi-IN':'Hindi','id-ID':'Indonesian','ms-MY':'Malay','th-TH':'Thai','vi-VN':'Vietnamese',
   };
   function langLabel(lang) { return langLabels[lang] || lang; }
-
+ 
   const femaleHints = ['female','woman','samantha','zira','susan','victoria','karen','moira','tessa','fiona','allison','ava','kate','amelie','amélie','anna','hedda','julie','marie','melina','milena','monica','paulina','sandy','sara','tarja','veena','yuna','alice','claire','eva','isabella','joanna','kyoko','lucia','mariska','serena','tina','whisper','tracy','sin-ji','ting-ting','mei-jia','meijia'];
   const maleHints = ['male','man','alex','daniel','fred','jorge','juan','luca','maged','oliver','otoya','ralph','rocko','thomas','xander','yuri','aaron','albert','bruce','george','gordon','arthur','david','mark','james'];
   function detectGender(v) {
@@ -413,7 +422,7 @@
     if (maleHints.some(k => n.includes(k))) return 'male';
     return 'unknown';
   }
-
+ 
   function populateLangSelect() {
     const sel = document.getElementById('lang-select');
     const allLangs = [...new Set(voices.map(v => v.lang))].filter(Boolean).sort();
@@ -482,9 +491,13 @@
       window.speechSynthesis.speak(u);
     } catch (e) {}
   }
-
-  document.getElementById('gear-btn').addEventListener('click', () => {
-    document.getElementById('settings-panel').classList.toggle('open');
+ 
+  function openSettings() { document.getElementById('settings-overlay').classList.add('open'); }
+  function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
+  document.getElementById('gear-btn').addEventListener('click', openSettings);
+  document.getElementById('settings-close').addEventListener('click', closeSettings);
+  document.getElementById('settings-overlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('settings-overlay')) closeSettings();
   });
   document.querySelectorAll('.seg-btn[data-gender]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -500,7 +513,7 @@
     pickVoice();
     speak('Hello, this is a voice preview');
   });
-
+ 
   populateTimezones();
   const tzSel = document.getElementById('tz-select');
   const tzHint = document.getElementById('tz-hint');
@@ -515,10 +528,10 @@
     tickClock();
   });
   updateTzHint();
-
+ 
   tickClock();
   setInterval(tickClock, 1000);
-
+ 
   const display = document.getElementById('timer-display');
   const minInput = document.getElementById('set-minutes');
   const autoToggle = document.getElementById('auto-toggle');
@@ -527,7 +540,7 @@
   let remaining = 300;
   let interval = null;
   const announced = { 180: false, 60: false, 0: false };
-
+ 
   function fmt(s) {
     s = Math.max(0, s);
     const m = Math.floor(s / 60), sec = s % 60;
@@ -539,7 +552,7 @@
   }
   function resetAnnounced() { announced[180] = false; announced[60] = false; announced[0] = false; }
   function stopTick() { if (interval) { clearInterval(interval); interval = null; } }
-
+ 
   function applyMinutes() {
     const v = Math.max(1, Math.min(180, parseInt(minInput.value, 10) || 5));
     minInput.value = v;
@@ -557,7 +570,7 @@
     remaining = totalSeconds;
     resetAnnounced(); stopTick(); render();
   });
-
+ 
   document.getElementById('start-btn').addEventListener('click', () => {
     if (interval) return;
     getCtx();
@@ -584,13 +597,13 @@
   document.getElementById('reset-btn').addEventListener('click', () => {
     stopTick(); remaining = totalSeconds; resetAnnounced(); render();
   });
-
+ 
   document.getElementById('btn-5min').addEventListener('click', () => speak('You have 5 minutes left'));
   document.getElementById('btn-3min').addEventListener('click', () => speak('You have 3 minutes left'));
   document.getElementById('btn-1min').addEventListener('click', () => speak('You have 1 minute left'));
   document.getElementById('btn-done').addEventListener('click', () => speak('Your time is up'));
   document.getElementById('btn-bell').addEventListener('click', () => { getCtx(); playSelectedBell(); });
-
+ 
   render();
 })();
   </script>
