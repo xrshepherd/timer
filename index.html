@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presentation Timer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", sans-serif; background: var(--color-background-tertiary); color: var(--color-text-primary); padding: 1rem; }
+    :root {
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f5f5f5;
+      --color-background-tertiary: #efefef;
+      --color-text-primary: #1a1a1a;
+      --color-text-secondary: #666666;
+      --color-text-tertiary: #999999;
+      --color-text-info: #0066cc;
+      --color-text-danger: #cc0000;
+      --color-background-info: #e6f1fb;
+      --color-border-tertiary: rgba(0, 0, 0, 0.15);
+      --color-border-secondary: rgba(0, 0, 0, 0.3);
+      --color-border-info: #0066cc;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background-primary: #1a1a1a;
+        --color-background-secondary: #2a2a2a;
+        --color-background-tertiary: #0f0f0f;
+        --color-text-primary: #ffffff;
+        --color-text-secondary: #cccccc;
+        --color-text-tertiary: #888888;
+        --color-text-info: #66b3ff;
+        --color-text-danger: #ff6666;
+        --color-background-info: #0d3d66;
+        --color-border-tertiary: rgba(255, 255, 255, 0.15);
+        --color-border-secondary: rgba(255, 255, 255, 0.3);
+        --color-border-info: #66b3ff;
+      }
+    }
+    .timer-wrap { display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0; max-width: 480px; margin: 0 auto; }
+    .header { display: flex; justify-content: flex-end; }
+    .gear-btn { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: #ffffff; transition: background 0.15s; }
+    .gear-btn:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+    .gear-btn:active { transform: scale(0.98); }
+    .settings-panel { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; display: none; }
+    .settings-panel.open { display: block; }
+    .settings-row { margin-bottom: 14px; }
+    .settings-row:last-child { margin-bottom: 0; }
+    .settings-label { font-size: 13px; font-weight: 500; color: var(--color-text-primary); display: block; margin-bottom: 8px; }
+    .seg-group { display: flex; gap: 4px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 3px; }
+    .seg-btn { flex: 1; padding: 7px 10px; font-size: 13px; cursor: pointer; background: transparent; border: none; border-radius: 6px; color: var(--color-text-secondary); }
+    .seg-btn:hover { color: var(--color-text-primary); }
+    .seg-btn.active { background: var(--color-background-info); color: var(--color-text-info); font-weight: 500; }
+    .bell-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 6px; }
+    .bell-option { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; font-size: 13px; transition: border-color 0.15s; }
+    .bell-option:hover { border-color: var(--color-border-secondary); }
+    .bell-option.active { border-color: var(--color-border-info); background: var(--color-background-info); color: var(--color-text-info); font-weight: 500; }
+    .bell-option .preview { font-size: 16px; opacity: 0.7; }
+    .hint { font-size: 12px; color: var(--color-text-tertiary); margin-top: 6px; }
+    .clock-row { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .clock-readout { font-size: 13px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+    .clock-readout strong { font-weight: 500; color: var(--color-text-primary); }
+    .timer-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; text-align: center; }
+    .timer-display { font-size: 56px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--color-text-primary); }
+    .timer-display.done { color: var(--color-text-danger); }
+    .set-row { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; font-size: 13px; color: var(--color-text-secondary); }
+    .set-row input { width: 64px; text-align: center; padding: 6px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); color: var(--color-text-primary); font-size: 13px; }
+    .controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+    .auto-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 0.5px solid var(--color-border-tertiary); font-size: 13px; color: var(--color-text-secondary); }
+    .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 24px; transition: background 0.2s, border-color 0.2s; }
+    .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 2px; top: 2px; background: var(--color-text-secondary); border-radius: 50%; transition: transform 0.2s, background 0.2s; }
+    .switch input:checked + .slider { background: var(--color-background-info); border-color: var(--color-border-info); }
+    .switch input:checked + .slider:before { transform: translateX(18px); background: var(--color-text-info); }
+    .section-label { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+    .btn-grid button { display: flex; align-items: center; justify-content: center; gap: 6px; }
+    button { font-size: 13px; padding: 8px 12px; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-primary); transition: background 0.15s; }
+    button:hover { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+    button:active { transform: scale(0.98); }
+    select { width: 100%; padding: 8px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); color: var(--color-text-primary); font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="timer-wrap">
+    <div class="header">
+      <button class="gear-btn" id="gear-btn" aria-label="Settings"><i class="ti ti-settings" aria-hidden="true"></i></button>
+    </div>
+
+    <div class="settings-panel" id="settings-panel">
+      <div class="settings-row">
+        <label class="settings-label">Voice</label>
+        <div class="seg-group" role="tablist">
+          <button class="seg-btn active" data-gender="female">Female</button>
+          <button class="seg-btn" data-gender="male">Male</button>
+          <button class="seg-btn" data-gender="any">Any</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label" for="lang-select">Accent</label>
+        <select id="lang-select"></select>
+        <div class="hint" id="voice-hint">Loading available voices…</div>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label" for="tz-select">Time zone (clock)</label>
+        <select id="tz-select"></select>
+        <div class="hint" id="tz-hint"></div>
+      </div>
+      <div class="settings-row">
+        <label class="settings-label">Bell sound</label>
+        <div class="bell-grid" id="bell-grid"></div>
+        <div class="hint">Tap a bell to select. Tap the play icon to preview.</div>
+      </div>
+    </div>
+
+    <div class="clock-row">
+      <svg width="180" height="180" viewBox="0 0 200 200" role="img" aria-label="Analog clock">
+        <circle cx="100" cy="100" r="94" fill="var(--color-background-primary)" stroke="var(--color-border-secondary)" stroke-width="1"/>
+        <g id="clock-markers"></g>
+        <line id="hour-hand" x1="100" y1="100" x2="100" y2="58" stroke="var(--color-text-primary)" stroke-width="4" stroke-linecap="round"/>
+        <line id="minute-hand" x1="100" y1="100" x2="100" y2="38" stroke="var(--color-text-primary)" stroke-width="2.5" stroke-linecap="round"/>
+        <line id="second-hand" x1="100" y1="100" x2="100" y2="28" stroke="#E24B4A" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="4" fill="var(--color-text-primary)"/>
+      </svg>
+      <div class="clock-readout"><strong id="clock-time">--:--:--</strong> <span id="clock-tz">Local</span></div>
+    </div>
+
+    <div class="timer-card">
+      <div class="timer-display" id="timer-display">05:00</div>
+      <div class="set-row">
+        <label for="set-minutes">Minutes:</label>
+        <input type="number" id="set-minutes" value="5" min="1" max="180" step="1"/>
+      </div>
+      <div class="controls">
+        <button id="start-btn"><i class="ti ti-player-play" aria-hidden="true"></i> Start</button>
+        <button id="pause-btn"><i class="ti ti-player-pause" aria-hidden="true"></i> Pause</button>
+        <button id="reset-btn"><i class="ti ti-refresh" aria-hidden="true"></i> Reset</button>
+      </div>
+      <div class="auto-row">
+        <span>Auto announcements at 3, 1 min &amp; end</span>
+        <label class="switch" aria-label="Toggle auto announcements">
+          <input type="checkbox" id="auto-toggle"/>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Manual sounds — tap any time</div>
+      <div class="btn-grid">
+        <button id="btn-5min"><i class="ti ti-volume" aria-hidden="true"></i> 5 min left</button>
+        <button id="btn-3min"><i class="ti ti-volume" aria-hidden="true"></i> 3 min left</button>
+        <button id="btn-1min"><i class="ti ti-volume" aria-hidden="true"></i> 1 min left</button>
+        <button id="btn-done"><i class="ti ti-volume" aria-hidden="true"></i> Time's up</button>
+        <button id="btn-bell"><i class="ti ti-bell" aria-hidden="true"></i> Bell</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.umd.js"></script>
+  <script>
+(function() {
+  const markers = document.getElementById('clock-markers');
+  const NS = 'http://www.w3.org/2000/svg';
+  for (let i = 0; i < 12; i++) {
+    const a = (i * 30) * Math.PI / 180;
+    const inner = i % 3 === 0 ? 80 : 84;
+    const ln = document.createElementNS(NS, 'line');
+    ln.setAttribute('x1', 100 + Math.sin(a) * inner);
+    ln.setAttribute('y1', 100 - Math.cos(a) * inner);
+    ln.setAttribute('x2', 100 + Math.sin(a) * 90);
+    ln.setAttribute('y2', 100 - Math.cos(a) * 90);
+    ln.setAttribute('stroke', 'var(--color-text-secondary)');
+    ln.setAttribute('stroke-width', i % 3 === 0 ? '2.5' : '1');
+    ln.setAttribute('stroke-linecap', 'round');
+    markers.appendChild(ln);
+  }
+
+  let selectedTz = 'LOCAL';
+  const localTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) { return 'UTC'; } })();
+
+  function populateTimezones() {
+    const sel = document.getElementById('tz-select');
+    sel.innerHTML = '';
+    const localOpt = document.createElement('option');
+    localOpt.value = 'LOCAL';
+    localOpt.textContent = 'Local time (' + localTz + ')';
+    sel.appendChild(localOpt);
+
+    let zones = [];
+    try { zones = Intl.supportedValuesOf('timeZone'); } catch(e) {}
+    if (!zones.length) {
+      zones = ['UTC','America/New_York','America/Los_Angeles','America/Chicago','America/Denver','America/Toronto','America/Vancouver','America/Mexico_City','America/Sao_Paulo','America/Buenos_Aires','Europe/London','Europe/Paris','Europe/Berlin','Europe/Madrid','Europe/Rome','Europe/Amsterdam','Europe/Moscow','Europe/Istanbul','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Asia/Dubai','Asia/Kolkata','Asia/Bangkok','Asia/Singapore','Asia/Hong_Kong','Asia/Shanghai','Asia/Tokyo','Asia/Seoul','Asia/Jakarta','Australia/Sydney','Australia/Melbourne','Australia/Perth','Pacific/Auckland','Pacific/Honolulu'];
+    }
+
+    const groups = {};
+    zones.forEach(z => {
+      const region = z.split('/')[0];
+      if (!groups[region]) groups[region] = [];
+      groups[region].push(z);
+    });
+    const order = ['UTC', 'Africa', 'America', 'Antarctica', 'Arctic', 'Asia', 'Atlantic', 'Australia', 'Europe', 'Indian', 'Pacific'];
+    order.forEach(region => {
+      if (!groups[region]) return;
+      if (region === 'UTC') {
+        groups[region].forEach(z => {
+          const opt = document.createElement('option');
+          opt.value = z; opt.textContent = z;
+          sel.appendChild(opt);
+        });
+        return;
+      }
+      const og = document.createElement('optgroup');
+      og.label = region;
+      groups[region].sort().forEach(z => {
+        const opt = document.createElement('option');
+        opt.value = z;
+        opt.textContent = z.split('/').slice(1).join(' / ').replace(/_/g, ' ');
+        og.appendChild(opt);
+      });
+      sel.appendChild(og);
+    });
+    sel.value = selectedTz;
+  }
+
+  function getClockTime(tz) {
+    const now = new Date();
+    const opts = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
+    if (tz && tz !== 'LOCAL') opts.timeZone = tz;
+    let parts;
+    try { parts = new Intl.DateTimeFormat('en-US', opts).formatToParts(now); }
+    catch (e) { parts = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false }).formatToParts(now); }
+    const get = type => parseInt((parts.find(p => p.type === type) || {}).value || '0', 10);
+    let h24 = get('hour'); if (h24 === 24) h24 = 0;
+    return { h24, m: get('minute'), s: get('second') };
+  }
+  function getTzAbbr(tz) {
+    if (!tz || tz === 'LOCAL') return '';
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'short' }).formatToParts(new Date());
+      const p = parts.find(x => x.type === 'timeZoneName');
+      return p ? p.value : '';
+    } catch(e) { return ''; }
+  }
+
+  const hourHand = document.getElementById('hour-hand');
+  const minHand = document.getElementById('minute-hand');
+  const secHand = document.getElementById('second-hand');
+  const timeEl = document.getElementById('clock-time');
+  const tzEl = document.getElementById('clock-tz');
+
+  function tickClock() {
+    const { h24, m, s } = getClockTime(selectedTz);
+    const h = h24 % 12;
+    hourHand.setAttribute('transform', `rotate(${h * 30 + m * 0.5} 100 100)`);
+    minHand.setAttribute('transform', `rotate(${m * 6 + s * 0.1} 100 100)`);
+    secHand.setAttribute('transform', `rotate(${s * 6} 100 100)`);
+    timeEl.textContent = String(h24).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (selectedTz === 'LOCAL') { tzEl.textContent = '· ' + localTz; }
+    else {
+      const ab = getTzAbbr(selectedTz);
+      const city = selectedTz.split('/').slice(1).join(' / ').replace(/_/g, ' ') || selectedTz;
+      tzEl.textContent = '· ' + city + (ab ? ' (' + ab + ')' : '');
+    }
+  }
+
+  let audioCtx = null;
+  function getCtx() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playBellChime() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    [0, 0.55, 1.1].forEach(offset => {
+      [880, 1320].forEach((freq, i) => {
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        const peak = i === 0 ? 0.35 : 0.15;
+        gain.gain.setValueAtTime(0, now + offset);
+        gain.gain.linearRampToValueAtTime(peak, now + offset + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.9);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now + offset); osc.stop(now + offset + 0.95);
+      });
+    });
+  }
+  function playDing() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = 1568;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.4, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(now); osc.stop(now + 1.6);
+  }
+  function playBuzzer() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    [0, 0.35, 0.7].forEach(offset => {
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = 'square'; osc.frequency.value = 220;
+      gain.gain.setValueAtTime(0, now + offset);
+      gain.gain.linearRampToValueAtTime(0.22, now + offset + 0.01);
+      gain.gain.setValueAtTime(0.22, now + offset + 0.25);
+      gain.gain.linearRampToValueAtTime(0, now + offset + 0.3);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + offset); osc.stop(now + offset + 0.3);
+    });
+  }
+  function playGong() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    [110, 165, 220, 277, 415].forEach((freq, i) => {
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      const peak = 0.35 / (i + 1);
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(peak, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 3.5);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now); osc.stop(now + 3.6);
+    });
+  }
+  function playBeep() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    [0, 0.2, 0.4].forEach(offset => {
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = 1000;
+      gain.gain.setValueAtTime(0, now + offset);
+      gain.gain.linearRampToValueAtTime(0.3, now + offset + 0.005);
+      gain.gain.setValueAtTime(0.3, now + offset + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.15);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(now + offset); osc.stop(now + offset + 0.16);
+    });
+  }
+  function playChurchBell() {
+    const ctx = getCtx(); if (!ctx) return;
+    const now = ctx.currentTime;
+    [0, 1.3].forEach(offset => {
+      [220, 330, 550, 880].forEach((freq, i) => {
+        const osc = ctx.createOscillator(); const gain = ctx.createGain();
+        osc.type = 'sine'; osc.frequency.value = freq;
+        const peak = 0.3 / (i + 1);
+        gain.gain.setValueAtTime(0, now + offset);
+        gain.gain.linearRampToValueAtTime(peak, now + offset + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 2.5);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(now + offset); osc.stop(now + offset + 2.6);
+      });
+    });
+  }
+
+  const bells = [
+    { id: 'gong',   label: 'Gong',   play: playGong },
+    { id: 'bell',   label: 'Chime',  play: playBellChime },
+    { id: 'ding',   label: 'Ding',   play: playDing },
+    { id: 'church', label: 'Church', play: playChurchBell },
+    { id: 'buzzer', label: 'Buzzer', play: playBuzzer },
+    { id: 'beep',   label: 'Beep',   play: playBeep },
+  ];
+  let selectedBellId = 'gong';
+  function playSelectedBell() {
+    const b = bells.find(x => x.id === selectedBellId) || bells[0];
+    b.play();
+  }
+  const bellGrid = document.getElementById('bell-grid');
+  bells.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'bell-option' + (b.id === selectedBellId ? ' active' : '');
+    el.dataset.id = b.id;
+    el.innerHTML = `<span>${b.label}</span><span class="preview" data-preview="${b.id}" role="button" aria-label="Preview ${b.label}"><i class="ti ti-player-play" aria-hidden="true"></i></span>`;
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('[data-preview]')) { getCtx(); b.play(); return; }
+      selectedBellId = b.id;
+      document.querySelectorAll('.bell-option').forEach(n => n.classList.toggle('active', n.dataset.id === b.id));
+      getCtx(); b.play();
+    });
+    bellGrid.appendChild(el);
+  });
+
+  let voices = [];
+  let selectedGender = 'female';
+  let selectedLang = 'en-GB';
+  let selectedVoice = null;
+  let userPickedLang = false;
+
+  const langLabels = {
+    'en-US':'English (United States)','en-GB':'English (United Kingdom)','en-AU':'English (Australia)','en-IN':'English (India)','en-IE':'English (Ireland)','en-ZA':'English (South Africa)','en-NZ':'English (New Zealand)','en-CA':'English (Canada)',
+    'fr-FR':'French (France)','fr-CA':'French (Canada)','es-ES':'Spanish (Spain)','es-MX':'Spanish (Mexico)','es-US':'Spanish (US)','de-DE':'German','it-IT':'Italian','pt-BR':'Portuguese (Brazil)','pt-PT':'Portuguese (Portugal)','ja-JP':'Japanese','ko-KR':'Korean','zh-CN':'Chinese (Mandarin)','zh-HK':'Chinese (Cantonese)','zh-TW':'Chinese (Taiwan)','nl-NL':'Dutch','sv-SE':'Swedish','da-DK':'Danish','nb-NO':'Norwegian','fi-FI':'Finnish','pl-PL':'Polish','ru-RU':'Russian','tr-TR':'Turkish','ar-SA':'Arabic','hi-IN':'Hindi','id-ID':'Indonesian','ms-MY':'Malay','th-TH':'Thai','vi-VN':'Vietnamese',
+  };
+  function langLabel(lang) { return langLabels[lang] || lang; }
+
+  const femaleHints = ['female','woman','samantha','zira','susan','victoria','karen','moira','tessa','fiona','allison','ava','kate','amelie','amélie','anna','hedda','julie','marie','melina','milena','monica','paulina','sandy','sara','tarja','veena','yuna','alice','claire','eva','isabella','joanna','kyoko','lucia','mariska','serena','tina','whisper','tracy','sin-ji','ting-ting','mei-jia','meijia'];
+  const maleHints = ['male','man','alex','daniel','fred','jorge','juan','luca','maged','oliver','otoya','ralph','rocko','thomas','xander','yuri','aaron','albert','bruce','george','gordon','arthur','david','mark','james'];
+  function detectGender(v) {
+    const n = (v.name || '').toLowerCase();
+    if (femaleHints.some(k => n.includes(k))) return 'female';
+    if (maleHints.some(k => n.includes(k))) return 'male';
+    return 'unknown';
+  }
+
+  function populateLangSelect() {
+    const sel = document.getElementById('lang-select');
+    const allLangs = [...new Set(voices.map(v => v.lang))].filter(Boolean).sort();
+    sel.innerHTML = '';
+    const en = allLangs.filter(l => l.toLowerCase().startsWith('en'));
+    const other = allLangs.filter(l => !l.toLowerCase().startsWith('en'));
+    [...en, ...other].forEach(l => {
+      const opt = document.createElement('option');
+      opt.value = l; opt.textContent = langLabel(l);
+      sel.appendChild(opt);
+    });
+    if (!userPickedLang) {
+      if (allLangs.includes('en-GB')) selectedLang = 'en-GB';
+      else if (allLangs.find(l => l.toLowerCase().startsWith('en-gb'))) selectedLang = allLangs.find(l => l.toLowerCase().startsWith('en-gb'));
+      else if (allLangs.find(l => l.toLowerCase().startsWith('en'))) selectedLang = allLangs.find(l => l.toLowerCase().startsWith('en'));
+      else if (allLangs[0]) selectedLang = allLangs[0];
+    }
+    if (allLangs.includes(selectedLang)) sel.value = selectedLang;
+    else if (allLangs.length) { selectedLang = allLangs[0]; sel.value = selectedLang; }
+  }
+  function pickVoice() {
+    if (!voices.length) { selectedVoice = null; return; }
+    let candidates = voices.filter(v => v.lang === selectedLang);
+    if (!candidates.length) {
+      const prefix = selectedLang.split('-')[0];
+      candidates = voices.filter(v => v.lang.toLowerCase().startsWith(prefix.toLowerCase()));
+    }
+    if (!candidates.length) candidates = voices;
+    let matched = candidates;
+    if (selectedGender !== 'any') {
+      const byGender = candidates.filter(v => detectGender(v) === selectedGender);
+      if (byGender.length) matched = byGender;
+    }
+    selectedVoice = matched[0];
+    const hint = document.getElementById('voice-hint');
+    if (selectedVoice) {
+      const detected = detectGender(selectedVoice);
+      hint.textContent = 'Using: ' + selectedVoice.name + (detected === 'unknown' && selectedGender !== 'any' ? ' (no clearly ' + selectedGender + ' voice for this accent — closest match shown)' : '');
+    } else {
+      hint.textContent = 'No matching voice available on this device.';
+    }
+  }
+  function loadVoices() {
+    voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+    populateLangSelect();
+    pickVoice();
+  }
+  if ('speechSynthesis' in window) {
+    loadVoices();
+    if (window.speechSynthesis.onvoiceschanged !== undefined) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    setTimeout(loadVoices, 300);
+    setTimeout(loadVoices, 1200);
+  } else {
+    document.getElementById('voice-hint').textContent = 'Speech synthesis not supported in this browser.';
+  }
+  function speak(text) {
+    if (!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      if (selectedVoice) { u.voice = selectedVoice; u.lang = selectedVoice.lang; }
+      else { u.lang = selectedLang; }
+      u.rate = 0.95; u.pitch = 1; u.volume = 1;
+      window.speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  document.getElementById('gear-btn').addEventListener('click', () => {
+    document.getElementById('settings-panel').classList.toggle('open');
+  });
+  document.querySelectorAll('.seg-btn[data-gender]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedGender = btn.dataset.gender;
+      document.querySelectorAll('.seg-btn[data-gender]').forEach(b => b.classList.toggle('active', b === btn));
+      pickVoice();
+      speak('Hello, this is a voice preview');
+    });
+  });
+  document.getElementById('lang-select').addEventListener('change', (e) => {
+    userPickedLang = true;
+    selectedLang = e.target.value;
+    pickVoice();
+    speak('Hello, this is a voice preview');
+  });
+
+  populateTimezones();
+  const tzSel = document.getElementById('tz-select');
+  const tzHint = document.getElementById('tz-hint');
+  function updateTzHint() {
+    if (selectedTz === 'LOCAL') { tzHint.textContent = 'Showing your device\'s local time.'; return; }
+    const ab = getTzAbbr(selectedTz);
+    tzHint.textContent = 'Clock shows ' + selectedTz.replace(/_/g,' ') + (ab ? ' (' + ab + ')' : '') + '.';
+  }
+  tzSel.addEventListener('change', (e) => {
+    selectedTz = e.target.value;
+    updateTzHint();
+    tickClock();
+  });
+  updateTzHint();
+
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  const display = document.getElementById('timer-display');
+  const minInput = document.getElementById('set-minutes');
+  const autoToggle = document.getElementById('auto-toggle');
+  autoToggle.checked = false;
+  let totalSeconds = 300;
+  let remaining = 300;
+  let interval = null;
+  const announced = { 180: false, 60: false, 0: false };
+
+  function fmt(s) {
+    s = Math.max(0, s);
+    const m = Math.floor(s / 60), sec = s % 60;
+    return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  }
+  function render() {
+    display.textContent = fmt(remaining);
+    display.classList.toggle('done', remaining <= 0);
+  }
+  function resetAnnounced() { announced[180] = false; announced[60] = false; announced[0] = false; }
+  function stopTick() { if (interval) { clearInterval(interval); interval = null; } }
+
+  function applyMinutes() {
+    const v = Math.max(1, Math.min(180, parseInt(minInput.value, 10) || 5));
+    minInput.value = v;
+    totalSeconds = v * 60;
+    remaining = totalSeconds;
+    resetAnnounced(); stopTick(); render();
+  }
+  minInput.addEventListener('change', applyMinutes);
+  minInput.addEventListener('input', () => {
+    const raw = minInput.value;
+    if (raw === '' ) return;
+    const v = parseInt(raw, 10);
+    if (Number.isNaN(v) || v < 1 || v > 180) return;
+    totalSeconds = v * 60;
+    remaining = totalSeconds;
+    resetAnnounced(); stopTick(); render();
+  });
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    if (interval) return;
+    getCtx();
+    if (remaining <= 0) { remaining = totalSeconds; resetAnnounced(); render(); }
+    interval = setInterval(() => {
+      remaining -= 1;
+      const auto = autoToggle.checked;
+      if (auto && remaining === 180 && !announced[180]) { announced[180] = true; speak('You have 3 minutes left'); }
+      if (auto && remaining === 60  && !announced[60])  { announced[60]  = true; speak('You have 1 minute left'); }
+      if (remaining <= 0 && !announced[0]) {
+        announced[0] = true;
+        if (auto) {
+          speak('Your time is up');
+          setTimeout(playSelectedBell, 1500);
+        } else {
+          playSelectedBell();
+        }
+        stopTick();
+      }
+      render();
+    }, 1000);
+  });
+  document.getElementById('pause-btn').addEventListener('click', stopTick);
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    stopTick(); remaining = totalSeconds; resetAnnounced(); render();
+  });
+
+  document.getElementById('btn-5min').addEventListener('click', () => speak('You have 5 minutes left'));
+  document.getElementById('btn-3min').addEventListener('click', () => speak('You have 3 minutes left'));
+  document.getElementById('btn-1min').addEventListener('click', () => speak('You have 1 minute left'));
+  document.getElementById('btn-done').addEventListener('click', () => speak('Your time is up'));
+  document.getElementById('btn-bell').addEventListener('click', () => { getCtx(); playSelectedBell(); });
+
+  render();
+})();
+  </script>
+</body>
+</html>
