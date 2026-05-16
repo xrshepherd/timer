@@ -94,7 +94,7 @@
     <div class="header">
       <button class="gear-btn" id="gear-btn" aria-label="Settings"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</button>
     </div>
- 
+
     <div class="settings-overlay" id="settings-overlay">
     <div class="settings-panel" id="settings-panel">
       <div class="settings-header">
@@ -126,7 +126,7 @@
       </div>
     </div>
     </div>
- 
+
     <div class="clock-row">
       <svg width="180" height="180" viewBox="0 0 200 200" role="img" aria-label="Analog clock">
         <circle cx="100" cy="100" r="94" fill="var(--color-background-primary)" stroke="var(--color-border-secondary)" stroke-width="1"/>
@@ -138,39 +138,61 @@
       </svg>
       <div class="clock-readout"><strong id="clock-time">--:--:--</strong> <span id="clock-tz">Local</span></div>
     </div>
- 
+
     <div class="timer-card">
-      <div class="timer-display" id="timer-display">05:00</div>
+      <div class="timer-display" id="timer-display">03:00</div>
       <div class="set-row">
         <label for="set-minutes">Minutes:</label>
-        <input type="number" id="set-minutes" value="5" min="1" max="180" step="1"/>
+        <input type="number" id="set-minutes" value="3" min="1" max="180" step="1"/>
       </div>
       <div class="controls">
         <button id="start-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg> Start</button>
         <button id="pause-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause</button>
         <button id="reset-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Reset</button>
       </div>
+      <div class="auto-row" style="border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 12px; margin-bottom: 12px;">
+        <span style="font-weight: 500;">Auto Announcements</span>
+        <label class="switch" aria-label="Toggle all announcements">
+          <input type="checkbox" id="auto-toggle-all"/>
+          <span class="slider"></span>
+        </label>
+      </div>
       <div class="auto-row">
-        <span>Auto announcements at 3, 1 min &amp; end</span>
-        <label class="switch" aria-label="Toggle auto announcements">
-          <input type="checkbox" id="auto-toggle"/>
+        <span>Auto announcement at the last <input type="number" id="auto-time-1" value="2" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
+        <label class="switch" aria-label="Toggle first announcement">
+          <input type="checkbox" id="auto-toggle-1"/>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="auto-row">
+        <span>Auto announcement at the last <input type="number" id="auto-time-2" value="1" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
+        <label class="switch" aria-label="Toggle second announcement">
+          <input type="checkbox" id="auto-toggle-2"/>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="auto-row">
+        <span>Auto announcement at end (Your time is up)</span>
+        <label class="switch" aria-label="Toggle end announcement">
+          <input type="checkbox" id="auto-toggle-3"/>
           <span class="slider"></span>
         </label>
       </div>
     </div>
- 
+
     <div>
       <div class="section-label">Manual sounds — tap any time</div>
       <div class="btn-grid">
         <button id="btn-5min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 5 min left</button>
         <button id="btn-3min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 3 min left</button>
+        <button id="btn-2min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 2 min left</button>
         <button id="btn-1min"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> 1 min left</button>
         <button id="btn-done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Time's up</button>
         <button id="btn-bell"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> Bell</button>
       </div>
     </div>
   </div>
- 
+
   <script>
 (function() {
   const markers = document.getElementById('clock-markers');
@@ -188,10 +210,10 @@
     ln.setAttribute('stroke-linecap', 'round');
     markers.appendChild(ln);
   }
- 
+
   let selectedTz = 'LOCAL';
   const localTz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) { return 'UTC'; } })();
- 
+
   function populateTimezones() {
     const sel = document.getElementById('tz-select');
     sel.innerHTML = '';
@@ -199,13 +221,13 @@
     localOpt.value = 'LOCAL';
     localOpt.textContent = 'Local time (' + localTz + ')';
     sel.appendChild(localOpt);
- 
+
     let zones = [];
     try { zones = Intl.supportedValuesOf('timeZone'); } catch(e) {}
     if (!zones.length) {
       zones = ['UTC','America/New_York','America/Los_Angeles','America/Chicago','America/Denver','America/Toronto','America/Vancouver','America/Mexico_City','America/Sao_Paulo','America/Buenos_Aires','Europe/London','Europe/Paris','Europe/Berlin','Europe/Madrid','Europe/Rome','Europe/Amsterdam','Europe/Moscow','Europe/Istanbul','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Asia/Dubai','Asia/Kolkata','Asia/Bangkok','Asia/Singapore','Asia/Hong_Kong','Asia/Shanghai','Asia/Tokyo','Asia/Seoul','Asia/Jakarta','Australia/Sydney','Australia/Melbourne','Australia/Perth','Pacific/Auckland','Pacific/Honolulu'];
     }
- 
+
     const groups = {};
     zones.forEach(z => {
       const region = z.split('/')[0];
@@ -235,7 +257,7 @@
     });
     sel.value = selectedTz;
   }
- 
+
   function getClockTime(tz) {
     const now = new Date();
     const opts = { hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false };
@@ -255,13 +277,13 @@
       return p ? p.value : '';
     } catch(e) { return ''; }
   }
- 
+
   const hourHand = document.getElementById('hour-hand');
   const minHand = document.getElementById('minute-hand');
   const secHand = document.getElementById('second-hand');
   const timeEl = document.getElementById('clock-time');
   const tzEl = document.getElementById('clock-tz');
- 
+
   function tickClock() {
     const { h24, m, s } = getClockTime(selectedTz);
     const h = h24 % 12;
@@ -276,7 +298,7 @@
       tzEl.textContent = '· ' + city + (ab ? ' (' + ab + ')' : '');
     }
   }
- 
+
   let audioCtx = null;
   function getCtx() {
     if (!audioCtx) {
@@ -287,7 +309,7 @@
     if (audioCtx.state === 'suspended') audioCtx.resume();
     return audioCtx;
   }
- 
+
   function playBellChime() {
     const ctx = getCtx(); if (!ctx) return;
     const now = ctx.currentTime;
@@ -373,7 +395,7 @@
       });
     });
   }
- 
+
   const bells = [
     { id: 'gong',   label: 'Gong',   play: playGong },
     { id: 'bell',   label: 'Chime',  play: playBellChime },
@@ -401,19 +423,19 @@
     });
     bellGrid.appendChild(el);
   });
- 
+
   let voices = [];
   let selectedGender = 'female';
   let selectedLang = 'en-GB';
   let selectedVoice = null;
   let userPickedLang = false;
- 
+
   const langLabels = {
     'en-US':'English (United States)','en-GB':'English (United Kingdom)','en-AU':'English (Australia)','en-IN':'English (India)','en-IE':'English (Ireland)','en-ZA':'English (South Africa)','en-NZ':'English (New Zealand)','en-CA':'English (Canada)',
     'fr-FR':'French (France)','fr-CA':'French (Canada)','es-ES':'Spanish (Spain)','es-MX':'Spanish (Mexico)','es-US':'Spanish (US)','de-DE':'German','it-IT':'Italian','pt-BR':'Portuguese (Brazil)','pt-PT':'Portuguese (Portugal)','ja-JP':'Japanese','ko-KR':'Korean','zh-CN':'Chinese (Mandarin)','zh-HK':'Chinese (Cantonese)','zh-TW':'Chinese (Taiwan)','nl-NL':'Dutch','sv-SE':'Swedish','da-DK':'Danish','nb-NO':'Norwegian','fi-FI':'Finnish','pl-PL':'Polish','ru-RU':'Russian','tr-TR':'Turkish','ar-SA':'Arabic','hi-IN':'Hindi','id-ID':'Indonesian','ms-MY':'Malay','th-TH':'Thai','vi-VN':'Vietnamese',
   };
   function langLabel(lang) { return langLabels[lang] || lang; }
- 
+
   const femaleHints = ['female','woman','samantha','zira','susan','victoria','karen','moira','tessa','fiona','allison','ava','kate','amelie','amélie','anna','hedda','julie','marie','melina','milena','monica','paulina','sandy','sara','tarja','veena','yuna','alice','claire','eva','isabella','joanna','kyoko','lucia','mariska','serena','tina','whisper','tracy','sin-ji','ting-ting','mei-jia','meijia'];
   const maleHints = ['male','man','alex','daniel','fred','jorge','juan','luca','maged','oliver','otoya','ralph','rocko','thomas','xander','yuri','aaron','albert','bruce','george','gordon','arthur','david','mark','james'];
   function detectGender(v) {
@@ -422,7 +444,7 @@
     if (maleHints.some(k => n.includes(k))) return 'male';
     return 'unknown';
   }
- 
+
   function populateLangSelect() {
     const sel = document.getElementById('lang-select');
     const allLangs = [...new Set(voices.map(v => v.lang))].filter(Boolean).sort();
@@ -491,7 +513,7 @@
       window.speechSynthesis.speak(u);
     } catch (e) {}
   }
- 
+
   function openSettings() { document.getElementById('settings-overlay').classList.add('open'); }
   function closeSettings() { document.getElementById('settings-overlay').classList.remove('open'); }
   document.getElementById('gear-btn').addEventListener('click', openSettings);
@@ -513,7 +535,7 @@
     pickVoice();
     speak('Hello, this is a voice preview');
   });
- 
+
   populateTimezones();
   const tzSel = document.getElementById('tz-select');
   const tzHint = document.getElementById('tz-hint');
@@ -528,19 +550,17 @@
     tickClock();
   });
   updateTzHint();
- 
+
   tickClock();
   setInterval(tickClock, 1000);
- 
+
   const display = document.getElementById('timer-display');
   const minInput = document.getElementById('set-minutes');
-  const autoToggle = document.getElementById('auto-toggle');
-  autoToggle.checked = false;
-  let totalSeconds = 300;
-  let remaining = 300;
+  let totalSeconds = 180;
+  let remaining = 180;
   let interval = null;
-  const announced = { 180: false, 60: false, 0: false };
- 
+  const announced = {};
+
   function fmt(s) {
     s = Math.max(0, s);
     const m = Math.floor(s / 60), sec = s % 60;
@@ -550,9 +570,15 @@
     display.textContent = fmt(remaining);
     display.classList.toggle('done', remaining <= 0);
   }
-  function resetAnnounced() { announced[180] = false; announced[60] = false; announced[0] = false; }
+  function resetAnnounced() { 
+    const time1 = parseInt(document.getElementById('auto-time-1').value) * 60;
+    const time2 = parseInt(document.getElementById('auto-time-2').value) * 60;
+    announced[time1] = false; 
+    announced[time2] = false; 
+    announced[0] = false; 
+  }
   function stopTick() { if (interval) { clearInterval(interval); interval = null; } }
- 
+
   function applyMinutes() {
     const v = Math.max(1, Math.min(180, parseInt(minInput.value, 10) || 5));
     minInput.value = v;
@@ -570,19 +596,24 @@
     remaining = totalSeconds;
     resetAnnounced(); stopTick(); render();
   });
- 
+
   document.getElementById('start-btn').addEventListener('click', () => {
     if (interval) return;
     getCtx();
     if (remaining <= 0) { remaining = totalSeconds; resetAnnounced(); render(); }
     interval = setInterval(() => {
       remaining -= 1;
-      const auto = autoToggle.checked;
-      if (auto && remaining === 180 && !announced[180]) { announced[180] = true; speak('You have 3 minutes left'); }
-      if (auto && remaining === 60  && !announced[60])  { announced[60]  = true; speak('You have 1 minute left'); }
+      const time1 = parseInt(document.getElementById('auto-time-1').value) * 60;
+      const time2 = parseInt(document.getElementById('auto-time-2').value) * 60;
+      const auto1 = document.getElementById('auto-toggle-1').checked;
+      const auto2 = document.getElementById('auto-toggle-2').checked;
+      const auto3 = document.getElementById('auto-toggle-3').checked;
+      
+      if (auto1 && remaining === time1 && !announced[time1]) { announced[time1] = true; speak('You have ' + document.getElementById('auto-time-1').value + ' minutes left'); }
+      if (auto2 && remaining === time2 && !announced[time2]) { announced[time2] = true; speak('You have ' + document.getElementById('auto-time-2').value + ' minute left'); }
       if (remaining <= 0 && !announced[0]) {
         announced[0] = true;
-        if (auto) {
+        if (auto3) {
           speak('Your time is up');
           setTimeout(playSelectedBell, 1500);
         } else {
@@ -597,13 +628,54 @@
   document.getElementById('reset-btn').addEventListener('click', () => {
     stopTick(); remaining = totalSeconds; resetAnnounced(); render();
   });
- 
-  document.getElementById('btn-5min').addEventListener('click', () => speak('You have 5 minutes left'));
-  document.getElementById('btn-3min').addEventListener('click', () => speak('You have 3 minutes left'));
-  document.getElementById('btn-1min').addEventListener('click', () => speak('You have 1 minute left'));
-  document.getElementById('btn-done').addEventListener('click', () => speak('Your time is up'));
-  document.getElementById('btn-bell').addEventListener('click', () => { getCtx(); playSelectedBell(); });
- 
+
+  // Button event listeners with null checks
+  const btn5min = document.getElementById('btn-5min');
+  if (btn5min) btn5min.addEventListener('click', () => speak('You have 5 minutes left'));
+  
+  const btn3min = document.getElementById('btn-3min');
+  if (btn3min) btn3min.addEventListener('click', () => speak('You have 3 minutes left'));
+  
+  const btn2min = document.getElementById('btn-2min');
+  if (btn2min) btn2min.addEventListener('click', () => speak('You have 2 minutes left'));
+  
+  const btn1min = document.getElementById('btn-1min');
+  if (btn1min) btn1min.addEventListener('click', () => speak('You have 1 minute left'));
+  
+  const btnDone = document.getElementById('btn-done');
+  if (btnDone) btnDone.addEventListener('click', () => speak('Your time is up'));
+  
+  const btnBell = document.getElementById('btn-bell');
+  if (btnBell) btnBell.addEventListener('click', () => { getCtx(); playSelectedBell(); });
+
+  // Toggle all announcements - with null checks
+  setTimeout(() => {
+    const toggleAll = document.getElementById('auto-toggle-all');
+    const toggle1 = document.getElementById('auto-toggle-1');
+    const toggle2 = document.getElementById('auto-toggle-2');
+    const toggle3 = document.getElementById('auto-toggle-3');
+    
+    if (toggleAll) {
+      toggleAll.addEventListener('change', (e) => {
+        if (toggle1) toggle1.checked = e.target.checked;
+        if (toggle2) toggle2.checked = e.target.checked;
+        if (toggle3) toggle3.checked = e.target.checked;
+      });
+    }
+    
+    // Update "toggle all" when individual toggles change
+    [toggle1, toggle2, toggle3].forEach(el => {
+      if (el) {
+        el.addEventListener('change', () => {
+          if (toggleAll) {
+            const all = (toggle1?.checked || false) && (toggle2?.checked || false) && (toggle3?.checked || false);
+            toggleAll.checked = all;
+          }
+        });
+      }
+    });
+  }, 100);
+
   render();
 })();
   </script>
