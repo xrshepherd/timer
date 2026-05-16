@@ -41,7 +41,7 @@
     }
     .timer-wrap { display: flex; flex-direction: column; gap: 1.25rem; padding: 1rem 0; max-width: 860px; margin: 0 auto; align-items: center; }
     .main-layout { display: flex; gap: 1.25rem; align-items: flex-start; justify-content: center; width: 100%; }
-    .main-left { flex: 0 0 48%; display: flex; flex-direction: column; gap: 1.25rem; }
+    .main-left { flex: 0 0 320px; display: flex; flex-direction: column; gap: 1.25rem; }
     .main-right { flex: 0 0 160px; display: flex; flex-direction: column; gap: 8px; padding-top: 0; }
     .header { display: flex; justify-content: flex-end; width: 100%; }
     .gear-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 12px; background: transparent; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-primary); transition: background 0.15s; }
@@ -157,28 +157,28 @@
         <button id="reset-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Reset</button>
       </div>
       <div class="auto-row" style="border-bottom: 0.5px solid var(--color-border-tertiary); padding-bottom: 12px; margin-bottom: 12px;">
-        <span style="font-weight: 500;">Auto Announcements</span>
+        <span style="font-weight: 500;">All Auto Announcements</span>
         <label class="switch" aria-label="Toggle all announcements">
           <input type="checkbox" id="auto-toggle-all"/>
           <span class="slider"></span>
         </label>
       </div>
       <div class="auto-row">
-        <span>Auto announcement at the last <input type="number" id="auto-time-1" value="2" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
+        <span>At the last <input type="number" id="auto-time-1" value="2" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
         <label class="switch" aria-label="Toggle first announcement">
           <input type="checkbox" id="auto-toggle-1"/>
           <span class="slider"></span>
         </label>
       </div>
       <div class="auto-row">
-        <span>Auto announcement at the last <input type="number" id="auto-time-2" value="1" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
+        <span>At the last <input type="number" id="auto-time-2" value="1" min="1" max="180" style="width: 45px; padding: 4px; border: 0.5px solid var(--color-border-tertiary); border-radius: 4px; text-align: center; font-size: 12px;"/> min</span>
         <label class="switch" aria-label="Toggle second announcement">
           <input type="checkbox" id="auto-toggle-2"/>
           <span class="slider"></span>
         </label>
       </div>
       <div class="auto-row">
-        <span>Auto announcement at end (Your time is up)</span>
+        <span>At end — "Your time is up"</span>
         <label class="switch" aria-label="Toggle end announcement">
           <input type="checkbox" id="auto-toggle-3"/>
           <span class="slider"></span>
